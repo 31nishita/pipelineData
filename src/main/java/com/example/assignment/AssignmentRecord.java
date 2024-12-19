@@ -24,6 +24,12 @@ public class AssignmentRecord {
 //    private List<UpSell> upSells ;
 //
 //
+@OneToMany(mappedBy = "assignmentRecord", cascade = CascadeType.ALL)
+private List<CrossSell> crossSells;
+
+    @OneToMany(mappedBy = "assignmentRecord", cascade = CascadeType.ALL)
+    private List<UpSell> upSells;
+
 
 
     private String SalesOrgID;
@@ -350,6 +356,22 @@ public class AssignmentRecord {
 //        this.crossSells = crossSells;
 //    }
 
+
+    public List<CrossSell> getCrossSells() {
+        return crossSells;
+    }
+
+    public void setCrossSells(List<CrossSell> crossSells) {
+        this.crossSells = crossSells;
+    }
+
+    public List<UpSell> getUpSells() {
+        return upSells;
+    }
+
+    public void setUpSells(List<UpSell> upSells) {
+        this.upSells = upSells;
+    }
 
     public AssignmentRecord(String orderNumber, String salesOrgID, String salesRegion, String salesSubRegion, String salesState, String salesUnit, String BLOrgID, String BLRegion, String BLSubRegion, String BLDomain, String BLComp, String BLUnit, String acctID, String acctCategory, String accountName, String sector, String industry, String closureDate, String closureStage, String startDate, String endDate, String productID, String serviceLine, String service, String techID, String partner, String technology, String serviceMode, String orderType, String serviceType, String engagementType, String projectValue, String margin, String CM) {
         this.orderNumber = orderNumber;

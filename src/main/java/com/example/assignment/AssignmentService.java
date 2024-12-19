@@ -8,6 +8,7 @@ import com.opencsv.CSVReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Service
+@Transactional
 public class AssignmentService {
     @Autowired
     private AssignmentRepository assignmentRepository;
@@ -35,16 +37,16 @@ public class AssignmentService {
                 rowNumber++;
 
                 // Skip header row
-                if (rowNumber == 1) {
-                    System.out.println("Skipping header row: " + Arrays.toString(row));
+                if (rowNumber == 1)
+                  //  System.out.println("Skipping header row: " + Arrays.toString(row));
                     continue;
-                }
+
 
                 // Validate row length
-                if (row.length < 64) {
-                    System.out.println("Skipping row #" + rowNumber + " due to insufficient columns: " + Arrays.toString(row));
+                if (row.length < 64)
+                    //System.out.println("Skipping row #" + rowNumber + " due to insufficient columns: " + Arrays.toString(row));
                     continue;
-                }
+
 
                 try {
                     // Create and populate AssignmentRecord
@@ -146,6 +148,7 @@ public class AssignmentService {
         crossSell.setAssignmentRecord(assignmentRecord);
         return crossSell;
     }
+
 
     private UpSell createUpSell(String orderNumber, String service, String technology, String partner, String projectedValue, String cm, AssignmentRecord assignmentRecord, String upSellType) {
         UpSell upSell = new UpSell();

@@ -47,18 +47,18 @@ public class TestController {
     private UpCellRepository upCellRepository;
 
 
-    @GetMapping("/print-records")
-    public String printAllRecords() {
-        List<AssignmentRecord> assignmentRecords = assignmentService.readCsv("D:\\PipelineData.csv");
-
-        // Ensure only up to 677 records are printed
-        int recordCount = Math.min(677, assignmentRecords.size());
-        for (int i = 0; i < recordCount; i++) {
-            System.out.println("Record #" + (i + 1) + ": " + assignmentRecords.get(i));
-        }
-
-        return "Successfully printed " + recordCount + " records to the console.";
-    }
+//    @GetMapping("/print-records")
+//    public String printAllRecords() {
+//        List<AssignmentRecord> assignmentRecords = assignmentService.readCsv("D:\\PipelineData.csv");
+//
+//        // Ensure only up to 677 records are printed
+//        int recordCount = Math.min(677, assignmentRecords.size());
+//        for (int i = 0; i < recordCount; i++) {
+//            System.out.println("Record #" + (i + 1) + ": " + assignmentRecords.get(i));
+//        }
+//
+//        return "Successfully printed " + recordCount + " records to the console.";
+//    }
 
 
     @PostMapping("/create")
@@ -89,9 +89,13 @@ public class TestController {
         return crossCellRepository.saveAll(crossSells);
     }
 
+
     @PostMapping("/upCells")
     public ResponseEntity<?> addUpSells(@RequestBody List<UpSell> UpSells) {
-        upCellRepository.saveAll(UpSells);
+        String filePath = "D:\\PipelineData.csv"; // Provide the actual path to the CSV file
+        List<AssignmentRecord> assignmentRecords = assignmentService.readCsv(filePath);
+
+        // crossCellRepository.saveAll(crossSells);
         return ResponseEntity.ok("UpSells saved successfully.");
     }
 
@@ -124,39 +128,26 @@ public class TestController {
             return ResponseEntity.status(500).body("Error processing file: " + e.getMessage());
         }
     }
+    @GetMapping("/print-records")
+    public String printAllRecords() {
+        List<AssignmentRecord> assignmentRecords = assignmentService.readCsv("D:\\PipelineData.csv");
+
+        for (AssignmentRecord record : assignmentRecords) {
+            System.out.println("Record: " + record);
+            System.out.println("CrossSells: " + record.getCrossSells());
+            System.out.println("UpSells: " + record.getUpSells());
+        }
+
+        return "Successfully printed " + assignmentRecords.size() + " records to the console.";
+    }
+
 
 }
 
 
 
 
-//    @Autowired
-//    private CrossSellUpSellService crossSellUpSellService;
-//
-//    @PostMapping("/{orderNumber}/crossSells")
-//    public ResponseEntity<?> addCrossSells(@PathVariable String orderNumber, @RequestBody List<CrossSell> crossSells) {
-//        crossSellUpSellService.addCrossSells(orderNumber, crossSells);
-//        return ResponseEntity.ok("Cross-sells added to order " + orderNumber);
-//    }
-//
-//    @PostMapping("/{orderNumber}/upsells")
-//    public ResponseEntity<?> addUpSells(@PathVariable String orderNumber, @RequestBody List<UpSell> upSells) {
-//        crossSellUpSellService.addUpSells(orderNumber, upSells);
-//        return ResponseEntity.ok("Up-sells added to order " + orderNumber);
-//    }
-//
-//    @GetMapping("/{orderNumber}/crosssells")
-//    public ResponseEntity<List<CrossSell>> getCrossSells(@PathVariable String orderNumber) {
-//        List<CrossSell> crossSells = crossSellUpSellService.getCrossSellsByOrderNumber(orderNumber);
-//        return ResponseEntity.ok(crossSells);
-//    }
-//
-//    @GetMapping("/{orderNumber}/upsells")
-//    public ResponseEntity<List<UpSell>> getUpSells(@PathVariable String orderNumber) {
-//        List<UpSell> upSells = crossSellUpSellService.getUpSellsByOrderNumber(orderNumber);
-//        return ResponseEntity.ok(upSells);
-//    }
-//
+
 
 
 
