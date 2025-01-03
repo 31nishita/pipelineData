@@ -6,6 +6,7 @@ import com.example.assignment.UpCell.UpCellRepository;
 import com.example.assignment.UpCell.UpSell;
 import org.apache.tomcat.util.file.ConfigurationSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +28,20 @@ public class TestController {
     @GetMapping("/api/testing")
     public String firstMethod() {
         return "testing";
+    }
+    @GetMapping("/api/getDetails")
+    public ResponseEntity<?> getDetailsByOrderNumber(@RequestParam String orderNumber) {
+        // Fetch the AssignmentRecord from the database
+        AssignmentRecord record = assignmentRepository.findByOrderNumber(orderNumber);
+
+        if (record == null) {
+            // If no record is found, return a 404 response
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No data found for the order number: " + orderNumber);
+        }
+
+        // Return the record with its associated CrossSell and UpSell data
+        return ResponseEntity.ok(record);
     }
 
     @GetMapping("/assignmentRecords")
@@ -143,14 +158,6 @@ public class TestController {
 
 
 }
-
-
-
-
-
-
-
-
 
 
 

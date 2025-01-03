@@ -2,6 +2,7 @@ package com.example.assignment.CrossCell;
 
 
 import com.example.assignment.AssignmentRecord;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,6 +37,7 @@ public class CrossSell{
 
     @ManyToOne
     @JoinColumn(name = "record", nullable = false)
+    @JsonBackReference
     private AssignmentRecord assignmentRecord;
 
 

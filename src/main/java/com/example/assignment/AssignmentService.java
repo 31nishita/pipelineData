@@ -18,6 +18,7 @@ import java.util.List;
 @Service
 @Transactional
 public class AssignmentService {
+
     @Autowired
     private AssignmentRepository assignmentRepository;
 
@@ -37,7 +38,7 @@ public class AssignmentService {
                 rowNumber++;
 
                 // Skip header row
-                if (rowNumber == 1)
+                if (rowNumber == 0)
                   //  System.out.println("Skipping header row: " + Arrays.toString(row));
                     continue;
 
@@ -49,7 +50,7 @@ public class AssignmentService {
 
 
                 try {
-                    // Create and populate AssignmentRecord
+
                     AssignmentRecord assignmentRecord = new AssignmentRecord();
                     assignmentRecord.setSalesOrgID(row[0]);
                     assignmentRecord.setSalesRegion(row[1]);

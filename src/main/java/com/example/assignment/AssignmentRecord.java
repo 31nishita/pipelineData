@@ -3,6 +3,7 @@ package com.example.assignment;
 
 import com.example.assignment.CrossCell.CrossSell;
 import com.example.assignment.UpCell.UpSell;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -25,9 +26,11 @@ public class AssignmentRecord {
 //
 //
 @OneToMany(mappedBy = "assignmentRecord", cascade = CascadeType.ALL)
+@JsonManagedReference
 private List<CrossSell> crossSells;
 
     @OneToMany(mappedBy = "assignmentRecord", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<UpSell> upSells;
 
 

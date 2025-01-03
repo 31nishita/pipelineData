@@ -1,5 +1,6 @@
 package com.example.assignment.UpCell;
 import com.example.assignment.AssignmentRecord;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,10 +17,6 @@ public class UpSell {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String orderNumber;
-//    @ManyToOne
-//   @JoinColumn(name = "record")
-//    //@JoinColumn(name = "order_number")
-//   private AssignmentRecord assignmentRecord;
 
 
     private String service;
@@ -33,6 +30,7 @@ public class UpSell {
 
     @ManyToOne
     @JoinColumn(name = "record", nullable = false)
+    @JsonBackReference
     private AssignmentRecord assignmentRecord;
 
 }
