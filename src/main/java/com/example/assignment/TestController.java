@@ -51,8 +51,7 @@ public class TestController {
         return assignmentRepository.findByOrderNumber(orderNumber);
     }
 
-    //public AssignmentRecord getassignmentRecords(@RequestParam(name = "orderNumber") String orderNumber) {
-    // return assignmentService.getRecordsByOrderNumber(orderNumber);
+
 
 
     @Autowired
@@ -62,18 +61,6 @@ public class TestController {
     private UpCellRepository upCellRepository;
 
 
-//    @GetMapping("/print-records")
-//    public String printAllRecords() {
-//        List<AssignmentRecord> assignmentRecords = assignmentService.readCsv("D:\\PipelineData.csv");
-//
-//        // Ensure only up to 677 records are printed
-//        int recordCount = Math.min(677, assignmentRecords.size());
-//        for (int i = 0; i < recordCount; i++) {
-//            System.out.println("Record #" + (i + 1) + ": " + assignmentRecords.get(i));
-//        }
-//
-//        return "Successfully printed " + recordCount + " records to the console.";
-//    }
 
 
     @PostMapping("/create")
