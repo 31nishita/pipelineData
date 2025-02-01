@@ -11,9 +11,8 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -38,13 +37,13 @@ public class AssignmentService {
                 rowNumber++;
 
                 // Skip header row
-                if (rowNumber == 0)
-                  //  System.out.println("Skipping header row: " + Arrays.toString(row));
+                if (rowNumber == 1)
+                    //  System.out.println("Skipping header row: " + Arrays.toString(row));
                     continue;
 
 
                 // Validate row length
-                if (row.length < 64)
+                if (row.length < 65)
                     //System.out.println("Skipping row #" + rowNumber + " due to insufficient columns: " + Arrays.toString(row));
                     continue;
 
@@ -69,23 +68,24 @@ public class AssignmentService {
                     assignmentRecord.setSector(row[14]);
                     assignmentRecord.setIndustry(row[15]);
                     assignmentRecord.setOrderNumber(row[16]);
-                    assignmentRecord.setClosureDate(row[17]);
-                    assignmentRecord.setClosureStage(row[18]);
-                    assignmentRecord.setStartDate(row[19]);
-                    assignmentRecord.setEndDate(row[20]);
-                    assignmentRecord.setProductID(row[21]);
-                    assignmentRecord.setServiceLine(row[22]);
-                    assignmentRecord.setService(row[23]);
-                    assignmentRecord.setTechID(row[24]);
-                    assignmentRecord.setPartner(row[25]);
-                    assignmentRecord.setTechnology(row[26]);
-                    assignmentRecord.setServiceMode(row[27]);
-                    assignmentRecord.setOrderType(row[28]);
-                    assignmentRecord.setServiceType(row[29]);
-                    assignmentRecord.setEngagementType(row[30]);
-                    assignmentRecord.setProjectValue(row[31]);// [(safeParseDouble(row[31]));
-                    assignmentRecord.setMargin(row[32]);//(safeParseDouble(row[32]));
-                    assignmentRecord.setCM(row[33]);//(safeParseDouble(row[33]));
+                    assignmentRecord.setCreateDate(row[17]);
+                    assignmentRecord.setClosureDate(row[18]);
+                    assignmentRecord.setClosureStage(row[19]);
+                    assignmentRecord.setStartDate(row[20]);
+                    assignmentRecord.setEndDate(row[21]);
+                    assignmentRecord.setProductID(row[22]);
+                    assignmentRecord.setServiceLine(row[23]);
+                    assignmentRecord.setService(row[24]);
+                    assignmentRecord.setTechID(row[25]);
+                    assignmentRecord.setPartner(row[26]);
+                    assignmentRecord.setTechnology(row[27]);
+                    assignmentRecord.setServiceMode(row[28]);
+                    assignmentRecord.setOrderType(row[29]);
+                    assignmentRecord.setServiceType(row[30]);
+                    assignmentRecord.setEngagementType(row[31]);
+                    assignmentRecord.setProjectValue(row[32]);// [(safeParseDouble(row[31]));
+                    assignmentRecord.setMargin(row[33]);//(safeParseDouble(row[32]));
+                    assignmentRecord.setCM(row[34]);//(safeParseDouble(row[33]));
 
                     // Save AssignmentRecord to DB
                     assignmentRecord = assignmentRepository.save(assignmentRecord);
@@ -112,9 +112,9 @@ public class AssignmentService {
 
     private void saveCrossSellData(String[] row, AssignmentRecord assignmentRecord) {
         try {
-            CrossSell crossSell1 = createCrossSell(row[16], row[34], row[35], row[36], row[37], row[38], assignmentRecord, "CrossSell1");
-            CrossSell crossSell2 = createCrossSell(row[16], row[39], row[40], row[41], row[42], row[43], assignmentRecord, "CrossSell2");
-            CrossSell crossSell3 = createCrossSell(row[16], row[44], row[45], row[46], row[47], row[48], assignmentRecord, "CrossSell3");
+            CrossSell crossSell1 = createCrossSell(row[16], row[35], row[36], row[37], row[38], row[39], assignmentRecord, "CrossSell1");
+            CrossSell crossSell2 = createCrossSell(row[16], row[40], row[41], row[42], row[43], row[44], assignmentRecord, "CrossSell2");
+            CrossSell crossSell3 = createCrossSell(row[16], row[45], row[46], row[47], row[48], row[49], assignmentRecord, "CrossSell3");
 
             crossCellRepository.saveAll(List.of(crossSell1, crossSell2, crossSell3));
         } catch (Exception e) {
@@ -126,9 +126,9 @@ public class AssignmentService {
 
     private void saveUpSellData(String[] row, AssignmentRecord assignmentRecord) {
         try {
-            UpSell upSell1 = createUpSell(row[16], row[49], row[50], row[51], row[52], row[53], assignmentRecord, "UpSell1");
-            UpSell upSell2 = createUpSell(row[16], row[54], row[55], row[56], row[57], row[58], assignmentRecord, "UpSell2");
-            UpSell upSell3 = createUpSell(row[16], row[59], row[60], row[61], row[62], row[63], assignmentRecord, "UpSell3");
+            UpSell upSell1 = createUpSell(row[16], row[50], row[51], row[52], row[53], row[54], assignmentRecord, "UpSell1");
+            UpSell upSell2 = createUpSell(row[16], row[55], row[56], row[57], row[58], row[59], assignmentRecord, "UpSell2");
+            UpSell upSell3 = createUpSell(row[16], row[60], row[61], row[62], row[63], row[64], assignmentRecord, "UpSell3");
 
             upCellRepository.saveAll(List.of(upSell1, upSell2, upSell3));
         } catch (Exception e) {
@@ -141,8 +141,8 @@ public class AssignmentService {
         CrossSell crossSell = new CrossSell();
         crossSell.setOrderNumber(orderNumber);
         crossSell.setService(service);
-        crossSell.setTechnology(technology);
         crossSell.setPartner(partner);
+        crossSell.setTechnology(technology);
         crossSell.setProjectedValue(projectedValue);//(safeParseDouble(projectedValue));
         crossSell.setCm(cm);//(safeParseDouble(cm));
         crossSell.setCrossSellType(crossSellType); // Set type
@@ -155,8 +155,8 @@ public class AssignmentService {
         UpSell upSell = new UpSell();
         upSell.setOrderNumber(orderNumber);
         upSell.setService(service);
-        upSell.setTechnology(technology);
         upSell.setPartner(partner);
+        upSell.setTechnology(technology);
         upSell.setProjectedValue(projectedValue);//(safeParseDouble(projectedValue));
         upSell.setCm(cm);//(safeParseDouble(cm));
         upSell.setUpSellType(upSellType); // Set type
@@ -173,9 +173,48 @@ public class AssignmentService {
             return 0.0;
         }
     }
+
+
+    public Map<String, Object> getFilteredRecordByOrderNumber(String orderNumber) {
+        // Fetch the record by order number
+        AssignmentRecord record = assignmentRepository.findById(orderNumber)
+                .orElseThrow(() -> new RuntimeException("Record not found for order number: " + orderNumber));
+
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("orderNumber", record.getOrderNumber());
+        response.put("salesRegion", record.getSalesRegion());
+        response.put("productID", record.getProductID());
+        response.put("partner", record.getPartner());
+        response.put("margin", record.getMargin());
+        response.put("projectValue", record.getProjectValue());
+
+
+        List<Map<String, String>> crossSellDetails = record.getCrossSells().stream().map(crossSell -> {
+            Map<String, String> crossSellMap = new HashMap<>();
+            crossSellMap.put("orderNumber", record.getOrderNumber());
+            crossSellMap.put("service", crossSell.getService());
+            crossSellMap.put("technology", crossSell.getTechnology());
+            crossSellMap.put("partner", crossSell.getPartner());
+
+            return crossSellMap;
+        }).collect(Collectors.toList());
+        response.put("crossSellDetails", crossSellDetails);
+
+        // Add UpSell details
+        List<Map<String, String>> upSellDetails = record.getUpSells().stream().map(upSell -> {
+            Map<String, String> upSellMap = new HashMap<>();
+            upSellMap.put("orderNumber", record.getOrderNumber());
+            upSellMap.put("service", upSell.getService());
+            upSellMap.put("partner", upSell.getPartner());
+            upSellMap.put("technology", upSell.getTechnology());
+            return upSellMap;
+        }).collect(Collectors.toList());
+        response.put("upSellDetails", upSellDetails);
+
+        return response;
+    }
 }
-
-
 
 
 

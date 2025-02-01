@@ -18,13 +18,7 @@ public class AssignmentRecord {
 
     @Id
     private String orderNumber;
-//    @OneToMany(mappedBy = "assignmentRecord", cascade = CascadeType.ALL)
-//    private List<CrossSell> crossSells ;
-//
-//    @OneToMany(mappedBy = "assignmentRecord", cascade = CascadeType.ALL)
-//    private List<UpSell> upSells ;
-//
-//
+
 @OneToMany(mappedBy = "assignmentRecord", cascade = CascadeType.ALL)
 @JsonManagedReference
 private List<CrossSell> crossSells;
@@ -51,6 +45,7 @@ private List<CrossSell> crossSells;
     private String AccountName;
     private String Sector;
     private String Industry;
+    private String CreateDate;
     private String ClosureDate;
     private String ClosureStage;
     private String startDate;
@@ -139,9 +134,11 @@ private List<CrossSell> crossSells;
         return orderNumber;
     }
 
-    public String getClosureDate() {
-        return ClosureDate;
+    public String getCreateDate() {
+        return CreateDate;
     }
+
+
 
     public String getClosureStage() {
         return ClosureStage;
@@ -162,6 +159,8 @@ private List<CrossSell> crossSells;
     public String getServiceLine() {
         return ServiceLine;
     }
+
+
 
     public String getService() {
         return Service;
@@ -275,8 +274,8 @@ private List<CrossSell> crossSells;
         this.orderNumber = orderNumber;
     }
 
-    public void setClosureDate(String closureDate) {
-        ClosureDate = closureDate;
+    public void setCreateDate(String createDate) {
+        CreateDate = createDate;
     }
 
     public void setClosureStage(String closureStage) {
@@ -376,8 +375,18 @@ private List<CrossSell> crossSells;
         this.upSells = upSells;
     }
 
-    public AssignmentRecord(String orderNumber, String salesOrgID, String salesRegion, String salesSubRegion, String salesState, String salesUnit, String BLOrgID, String BLRegion, String BLSubRegion, String BLDomain, String BLComp, String BLUnit, String acctID, String acctCategory, String accountName, String sector, String industry, String closureDate, String closureStage, String startDate, String endDate, String productID, String serviceLine, String service, String techID, String partner, String technology, String serviceMode, String orderType, String serviceType, String engagementType, String projectValue, String margin, String CM) {
+    public String getClosureDate() {
+        return ClosureDate;
+    }
+
+    public void setClosureDate(String closureDate) {
+        ClosureDate = closureDate;
+    }
+
+    public AssignmentRecord(String orderNumber, List<CrossSell> crossSells, List<UpSell> upSells, String salesOrgID, String salesRegion, String salesSubRegion, String salesState, String salesUnit, String BLOrgID, String BLRegion, String BLSubRegion, String BLDomain, String BLComp, String BLUnit, String acctID, String acctCategory, String accountName, String sector, String industry, String createDate,String closureDate, String closureStage, String startDate, String endDate, String productID, String serviceLine, String service, String techID, String partner, String technology, String serviceMode, String orderType, String serviceType, String engagementType, String projectValue, String margin, String CM) {
         this.orderNumber = orderNumber;
+        this.crossSells = crossSells;
+        this.upSells = upSells;
         SalesOrgID = salesOrgID;
         SalesRegion = salesRegion;
         SalesSubRegion = salesSubRegion;
@@ -394,7 +403,8 @@ private List<CrossSell> crossSells;
         AccountName = accountName;
         Sector = sector;
         Industry = industry;
-        ClosureDate = closureDate;
+        CreateDate = createDate;
+        ClosureDate= closureDate;
         ClosureStage = closureStage;
         this.startDate = startDate;
         EndDate = endDate;

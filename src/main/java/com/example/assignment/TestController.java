@@ -14,7 +14,10 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 public class TestController {
@@ -29,6 +32,7 @@ public class TestController {
     public String firstMethod() {
         return "testing";
     }
+
     @GetMapping("/api/getDetails")
     public ResponseEntity<?> getDetailsByOrderNumber(@RequestParam String orderNumber) {
         // Fetch the AssignmentRecord from the database
@@ -51,100 +55,173 @@ public class TestController {
         return assignmentRepository.findByOrderNumber(orderNumber);
     }
 
+    @RequestMapping("/records")
 
-
-
-    @Autowired
-    private CrossCellRepository crossCellRepository;
-
-    @Autowired
-    private UpCellRepository upCellRepository;
-
-
-
-
-    @PostMapping("/create")
-    public AssignmentRecord createAssignmentRecord(@RequestBody AssignmentRecord assignmentRecord) {
-        return assignmentRepository.save(assignmentRecord);
+    @GetMapping
+    public ResponseEntity<Map<String, Object>> getRecordByOrderNumber(@RequestParam String orderNumber) {
+        Map<String, Object> response = assignmentService.getFilteredRecordByOrderNumber(orderNumber);
+        return ResponseEntity.ok(response);
     }
-
-    @PostMapping("/crossCells")
-    public ResponseEntity<?> addCrossSells() {
-        String filePath = "D:\\PipelineData.csv"; // Provide the actual path to the CSV file
-        List<AssignmentRecord> assignmentRecords = assignmentService.readCsv(filePath);
-
-        // crossCellRepository.saveAll(crossSells);
-        return ResponseEntity.ok("CrossSells saved successfully.");
-    }
-
-    @PostMapping("/{orderNumber}/crossCells")
-    public List<CrossSell> addCrossSellsToOrderNumber(
-            @PathVariable String orderNumber,
-            @RequestBody List<CrossSell> crossSells) {
-
-        AssignmentRecord assignmentRecord = assignmentRepository.findByOrderNumber(orderNumber);
-
-
-        // Set the reference to the AssignmentRecord for each CrossCell
-        //crossSells.forEach(crossSell -> crossSell.setAssignmentRecord(assignmentRecord));
-
-        return crossCellRepository.saveAll(crossSells);
-    }
-
-
-    @PostMapping("/upCells")
-    public ResponseEntity<?> addUpSells(@RequestBody List<UpSell> UpSells) {
-        String filePath = "D:\\PipelineData.csv"; // Provide the actual path to the CSV file
-        List<AssignmentRecord> assignmentRecords = assignmentService.readCsv(filePath);
-
-        // crossCellRepository.saveAll(crossSells);
-        return ResponseEntity.ok("UpSells saved successfully.");
-    }
-
-
-    @PostMapping("/{orderNumber}/upSells")
-    public List<UpSell> addUpSellsToOrder(
-            @PathVariable String orderNumber,
-            @RequestBody List<UpSell> upSells) {
-
-        AssignmentRecord assignmentRecord = assignmentRepository.findByOrderNumber(orderNumber);
-
-
-        // Set the reference to the AssignmentRecord for each UpCell
-        //upSells.forEach(upSell -> upSell.setAssignmentRecord(assignmentRecord));
-
-        return upCellRepository.saveAll(upSells);
-    }
-
-    @PostMapping("/upload")
-    public ResponseEntity<?> uploadCsv(@RequestParam("file") MultipartFile file) {
-        try {
-            // Save the file locally
-            File csvFile = new File("D:\\PipelineData.csv") ;
-            file.transferTo(csvFile);
-
-            // Process the file
-            List<AssignmentRecord> records = assignmentService.readCsv(csvFile.getAbsolutePath());
-            return ResponseEntity.ok("Successfully processed " + 677 + " records.");
-        } catch (IOException e) {
-            return ResponseEntity.status(500).body("Error processing file: " + e.getMessage());
-        }
-    }
-    @GetMapping("/print-records")
-    public String printAllRecords() {
-        List<AssignmentRecord> assignmentRecords = assignmentService.readCsv("D:\\PipelineData.csv");
-
-        for (AssignmentRecord record : assignmentRecords) {
-            System.out.println("Record: " + record);
-            System.out.println("CrossSells: " + record.getCrossSells());
-            System.out.println("UpSells: " + record.getUpSells());
-        }
-
-        return "Successfully printed " + assignmentRecords.size() + " records to the console.";
-    }
-
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//    @Autowired
+//    private CrossCellRepository crossCellRepository;
+//
+//    @Autowired
+//    private UpCellRepository upCellRepository;
+//
+//
+//
+//
+//    @PostMapping("/create")
+//    public AssignmentRecord createAssignmentRecord(@RequestBody AssignmentRecord assignmentRecord) {
+//        return assignmentRepository.save(assignmentRecord);
+//    }
+//
+//    @PostMapping("/crossCells")
+//    public ResponseEntity<?> addCrossSells() {
+//        String filePath = "D:\\PipelineData.csv"; // Provide the actual path to the CSV file
+//        List<AssignmentRecord> assignmentRecords = assignmentService.readCsv(filePath);
+//
+//        // crossCellRepository.saveAll(crossSells);
+//        return ResponseEntity.ok("CrossSells saved successfully.");
+//    }
+//
+//    @PostMapping("/{orderNumber}/crossCells")
+//    public List<CrossSell> addCrossSellsToOrderNumber(
+//            @PathVariable String orderNumber,
+//            @RequestBody List<CrossSell> crossSells) {
+//
+//        AssignmentRecord assignmentRecord = assignmentRepository.findByOrderNumber(orderNumber);
+//
+//
+//        // Set the reference to the AssignmentRecord for each CrossCell
+//        //crossSells.forEach(crossSell -> crossSell.setAssignmentRecord(assignmentRecord));
+//
+//        return crossCellRepository.saveAll(crossSells);
+//    }
+//
+//
+//    @PostMapping("/upCells")
+//    public ResponseEntity<?> addUpSells(@RequestBody List<UpSell> UpSells) {
+//        String filePath = "D:\\PipelineData.csv"; // Provide the actual path to the CSV file
+//        List<AssignmentRecord> assignmentRecords = assignmentService.readCsv(filePath);
+//
+//        // crossCellRepository.saveAll(crossSells);
+//        return ResponseEntity.ok("UpSells saved successfully.");
+//    }
+//
+//
+//    @PostMapping("/{orderNumber}/upSells")
+//    public List<UpSell> addUpSellsToOrder(
+//            @PathVariable String orderNumber,
+//            @RequestBody List<UpSell> upSells) {
+//
+//        AssignmentRecord assignmentRecord = assignmentRepository.findByOrderNumber(orderNumber);
+//
+//
+//        // Set the reference to the AssignmentRecord for each UpCell
+//        //upSells.forEach(upSell -> upSell.setAssignmentRecord(assignmentRecord));
+//
+//        return upCellRepository.saveAll(upSells);
+//    }
+//
+//    @PostMapping("/upload")
+//    public ResponseEntity<?> uploadCsv(@RequestParam("file") MultipartFile file) {
+//        try {
+//            // Save the file locally
+//            File csvFile = new File("D:\\PipelineData.csv") ;
+//            file.transferTo(csvFile);
+//
+//            // Process the file
+//            List<AssignmentRecord> records = assignmentService.readCsv(csvFile.getAbsolutePath());
+//            return ResponseEntity.ok("Successfully processed " + 677 + " records.");
+//        } catch (IOException e) {
+//            return ResponseEntity.status(500).body("Error processing file: " + e.getMessage());
+//        }
+//    }
+//    @GetMapping("/print-records")
+//    public String printAllRecords() {
+//        List<AssignmentRecord> assignmentRecords = assignmentService.readCsv("D:\\PipelineData.csv");
+//
+//        for (AssignmentRecord record : assignmentRecords) {
+//            System.out.println("Record: " + record);
+//            System.out.println("CrossSells: " + record.getCrossSells());
+//            System.out.println("UpSells: " + record.getUpSells());
+//        }
+//
+//        return "Successfully printed " + assignmentRecords.size() + " records to the console.";
+//    }
+
+//}
+
+
+
+
 
 
 
