@@ -303,6 +303,39 @@ public class AssignmentService {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //    public List<Map<String, Object>> getRecordsByType(String type, String value) {
 //        List<AssignmentRecord> records;
 //
