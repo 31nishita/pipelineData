@@ -8,6 +8,7 @@ import com.opencsv.CSVReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Column;
 import javax.transaction.Transactional;
 import java.io.FileReader;
 import java.io.IOException;
@@ -56,12 +57,12 @@ public class AssignmentService {
                     assignmentRecord.setSalesSubRegion(row[2]);
                     assignmentRecord.setSalesState(row[3]);
                     assignmentRecord.setSalesUnit(row[4]);
-                    assignmentRecord.setBLOrgID(row[5]);
-                    assignmentRecord.setBLRegion(row[6]);
-                    assignmentRecord.setBLSubRegion(row[7]);
-                    assignmentRecord.setBLDomain(row[8]);
-                    assignmentRecord.setBLComp(row[9]);
-                    assignmentRecord.setBLUnit(row[10]);
+                    assignmentRecord.setbLOrgID(row[5]);
+                    assignmentRecord.setbLRegion(row[6]);
+                    assignmentRecord.setbLSubRegion(row[7]);
+                    assignmentRecord.setbLDomain(row[8]);
+                    assignmentRecord.setbLComp(row[9]);
+                    assignmentRecord.setbLUnit(row[10]);
                     assignmentRecord.setAcctID(row[11]);
                     assignmentRecord.setAcctCategory(row[12]);
                     assignmentRecord.setAccountName(row[13]);
@@ -85,7 +86,7 @@ public class AssignmentService {
                     assignmentRecord.setEngagementType(row[31]);
                     assignmentRecord.setProjectValue(row[32]);// [(safeParseDouble(row[31]));
                     assignmentRecord.setMargin(row[33]);//(safeParseDouble(row[32]));
-                    assignmentRecord.setCM(row[34]);//(safeParseDouble(row[33]));
+                    assignmentRecord.setCm(row[34]);//(safeParseDouble(row[33]));
 
                     // Save AssignmentRecord to DB
                     assignmentRecord = assignmentRepository.save(assignmentRecord);
@@ -214,9 +215,183 @@ public class AssignmentService {
 
         return response;
     }
+    public List<Map<String, Object>> getRecordsBySalesRegion(String salesRegion) {
+        List<AssignmentRecord> records = assignmentRepository.findBySalesRegion(salesRegion);
+
+        if (records.isEmpty()) {
+            throw new RuntimeException("No records found for salesRegion containing: " + salesRegion);
+        }
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (AssignmentRecord record : records) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("salesRegion", record.getSalesOrgID());
+        response.put("salesOrgId", record.getSalesRegion());
+        response.put("salesSubRegion", record.getSalesSubRegion());
+        response.put("salesState", record.getSalesState());
+        response.put("salesUnit", record.getSalesUnit());
+        response.put("bLOrgId", record.getbLOrgID());
+        response.put("bLRegion", record.getbLRegion());
+        response.put("bLSubRegion", record.getbLSubRegion());
+        response.put("bLDomain", record.getbLDomain());
+        response.put("bLComp", record.getbLComp());
+        response.put("bLUnit", record.getbLUnit());
+        response.put("acctID", record.getAcctID());
+        response.put("acctCategory", record.getAcctCategory());
+        response.put("accountName", record.getAccountName());
+        response.put("industry", record.getIndustry());
+        response.put("orderNumber", record.getOrderNumber());
+        response.put("createDate", record.getCreateDate());
+        response.put("closureDate", record.getClosureDate());
+        response.put("closureStage", record.getClosureStage());
+        response.put("startDate", record.getStartDate());
+        response.put("endDate", record.getEndDate());
+        response.put("productID", record.getProductID());
+        response.put("serviceLine", record.getServiceLine());
+        response.put("service", record.getService());
+        response.put("techID", record.getTechID());
+        response.put("partner", record.getPartner());
+        response.put("technology", record.getTechnology());
+        response.put("serviceMode", record.getServiceMode());
+        response.put("orderType", record.getOrderType());
+        response.put("serviceType", record.getServiceType());
+        response.put("engagementType", record.getMargin());
+        response.put("projectedValue", record.getProjectValue());
+        response.put("margin", record.getIndustry());
+        response.put("CM", record.getCm());
+
+
+            // Fetch CrossSell data
+            List<Map<String, String>> crossSellDetails = record.getCrossSells().stream()
+                    .map(crossSell -> Map.of(
+                            "service", crossSell.getService(),
+                            "technology", crossSell.getTechnology(),
+                            "partner", crossSell.getPartner(),
+                            "projectedValue", crossSell.getProjectedValue(),
+                            "cm", crossSell.getCm()))
+                    .collect(Collectors.toList());
+
+            response.put("crossSellDetails", crossSellDetails);
+
+            // Fetch UpSell data
+            List<Map<String, String>> upSellDetails = record.getUpSells().stream()
+                    .map(upSell -> Map.of(
+                            "service", upSell.getService(),
+                            "technology", upSell.getTechnology(),
+                            "partner", upSell.getPartner(),
+                            "projectedValue", upSell.getProjectedValue(),
+                            "cm", upSell.getCm()))
+                    .collect(Collectors.toList());
+
+            response.put("upSellDetails", upSellDetails);
+
+            result.add(response);
+        }
+
+        return result;
+    }
+    public List<String> getOrderNumbersBySalesRegion(String salesRegion) {
+        List<AssignmentRecord> records = assignmentRepository.findBySalesRegion(salesRegion);
+        if (records.isEmpty()) {
+            throw new RuntimeException("No records found for Sales Region: " + salesRegion);
+        }
+        return records.stream()
+                .map(AssignmentRecord::getOrderNumber)
+                .collect(Collectors.toList());
+    }
+
 }
 
 
+//    public List<Map<String, Object>> getRecordsByType(String type, String value) {
+//        List<AssignmentRecord> records;
+//
+//        // Dynamically filter based on the 'type' parameter
+//        switch (type) {
+//            case "salesRegion":
+//                records = assignmentRepository.findBySalesRegion(value);
+//                break;
+//            case "orderNumber":
+//                records = (List<AssignmentRecord>) assignmentRepository.findByOrderNumber(value);
+//                break;
+//            default:
+//                throw new IllegalArgumentException("Invalid type: " + type);
+//        }
+//
+//        if (records.isEmpty()) {
+//            throw new RuntimeException("No records found for " + type + ": " + value);
+//        }
+//
+//        List<Map<String, Object>> result = new ArrayList<>();
+//        for (AssignmentRecord record : records) {
+//            Map<String, Object> response = new HashMap<>();
+//            response.put("salesRegion", record.getSalesOrgID());
+//        response.put("salesOrgId", record.getSalesRegion());
+//        response.put("salesSubRegion", record.getSalesSubRegion());
+//        response.put("salesState", record.getSalesState());
+//        response.put("salesUnit", record.getSalesUnit());
+//        response.put("bLOrgId", record.getbLOrgID());
+//        response.put("bLRegion", record.getbLRegion());
+//        response.put("bLSubRegion", record.getbLSubRegion());
+//        response.put("bLDomain", record.getbLDomain());
+//        response.put("bLComp", record.getbLComp());
+//        response.put("bLUnit", record.getbLUnit());
+//        response.put("acctID", record.getAcctID());
+//        response.put("acctCategory", record.getAcctCategory());
+//        response.put("accountName", record.getAccountName());
+//        response.put("industry", record.getIndustry());
+//        response.put("orderNumber", record.getOrderNumber());
+//        response.put("createDate", record.getCreateDate());
+//        response.put("closureDate", record.getClosureDate());
+//        response.put("closureStage", record.getClosureStage());
+//        response.put("startDate", record.getStartDate());
+//        response.put("endDate", record.getEndDate());
+//        response.put("productID", record.getProductID());
+//        response.put("serviceLine", record.getServiceLine());
+//        response.put("service", record.getService());
+//        response.put("techID", record.getTechID());
+//        response.put("partner", record.getPartner());
+//        response.put("technology", record.getTechnology());
+//        response.put("serviceMode", record.getServiceMode());
+//        response.put("orderType", record.getOrderType());
+//        response.put("serviceType", record.getServiceType());
+//        response.put("engagementType", record.getMargin());
+//        response.put("projectedValue", record.getProjectValue());
+//        response.put("margin", record.getIndustry());
+//        response.put("CM", record.getCm());
+//
+//            // Add cross-sell details
+//            List<Map<String, String>> crossSellDetails = record.getCrossSells().stream().map(crossSell -> {
+//                Map<String, String> crossSellMap = new HashMap<>();
+//                crossSellMap.put("service", crossSell.getService());
+//                crossSellMap.put("technology", crossSell.getTechnology());
+//                crossSellMap.put("partner", crossSell.getPartner());
+//                crossSellMap.put("projectedValue", crossSell.getProjectedValue());
+//                crossSellMap.put("cm", crossSell.getCm());
+//                return crossSellMap;
+//            }).collect(Collectors.toList());
+//
+//            response.put("crossSellDetails", crossSellDetails);
+//
+//            // Add up-sell details
+//            List<Map<String, String>> upSellDetails = record.getUpSells().stream().map(upSell -> {
+//                Map<String, String> upSellMap = new HashMap<>();
+//                upSellMap.put("service", upSell.getService());
+//                upSellMap.put("technology", upSell.getTechnology());
+//                upSellMap.put("partner", upSell.getPartner());
+//                upSellMap.put("projectedValue", upSell.getProjectedValue());
+//                upSellMap.put("cm", upSell.getCm());
+//                return upSellMap;
+//            }).collect(Collectors.toList());
+//
+//            response.put("upSellDetails", upSellDetails);
+//
+//            result.add(response);
+//        }
+//
+//        return result;
+//    }
+//}
 
 
 
@@ -232,6 +407,277 @@ public class AssignmentService {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//    public Map<String, Object> getSalesRegion(String salesRegion) {
+//        // Fetch the record by order number
+//        AssignmentRecord record = assignmentRepository.findById(salesRegion)
+//                .orElseThrow(() -> new RuntimeException("Record not found for order number: " + salesRegion));
+//
+//
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("salesRegion", record.getSalesOrgID());
+//        response.put("salesOrgId", record.getSalesRegion());
+//        response.put("salesSubRegion", record.getSalesSubRegion());
+//        response.put("salesState", record.getSalesState());
+//        response.put("salesUnit", record.getSalesUnit());
+//        response.put("bLOrgId", record.getbLOrgID());
+//        response.put("bLRegion", record.getbLRegion());
+//        response.put("bLSubRegion", record.getbLSubRegion());
+//        response.put("bLDomain", record.getbLDomain());
+//        response.put("bLComp", record.getbLComp());
+//        response.put("bLUnit", record.getbLUnit());
+//        response.put("acctID", record.getAcctID());
+//        response.put("acctCategory", record.getAcctCategory());
+//        response.put("accountName", record.getAccountName());
+//        response.put("industry", record.getIndustry());
+//        response.put("orderNumber", record.getOrderNumber());
+//        response.put("createDate", record.getCreateDate());
+//        response.put("closureDate", record.getClosureDate());
+//        response.put("closureStage", record.getClosureStage());
+//        response.put("startDate", record.getStartDate());
+//        response.put("endDate", record.getEndDate());
+//        response.put("productID", record.getProductID());
+//        response.put("serviceLine", record.getServiceLine());
+//        response.put("service", record.getService());
+//        response.put("techID", record.getTechID());
+//        response.put("partner", record.getPartner());
+//        response.put("technology", record.getTechnology());
+//        response.put("serviceMode", record.getServiceMode());
+//        response.put("orderType", record.getOrderType());
+//        response.put("serviceType", record.getServiceType());
+//        response.put("engagementType", record.getMargin());
+//        response.put("projectedValue", record.getProjectValue());
+//        response.put("margin", record.getIndustry());
+//        response.put("CM", record.getCm());
+//
+//
+//
+//        List<Map<String, String>> crossSellDetails = record.getCrossSells().stream().map(crossSell -> {
+//            Map<String, String> crossSellMap = new HashMap<>();
+//            crossSellMap.put("salesRegion", record.getOrderNumber());
+//            crossSellMap.put("service", crossSell.getService());
+//            crossSellMap.put("technology", crossSell.getTechnology());
+//            crossSellMap.put("partner", crossSell.getPartner());
+//            crossSellMap.put("projectedValue", crossSell.getProjectedValue());
+//            crossSellMap.put("cm", crossSell.getCm());
+//            return crossSellMap;
+//        }).collect(Collectors.toList());
+//        response.put("crossSellDetails", crossSellDetails);
+//
+//        // Add UpSell details
+//        List<Map<String, String>> upSellDetails = record.getUpSells().stream().map(upSell -> {
+//            Map<String, String> upSellMap = new HashMap<>();
+//            upSellMap.put("salesRegion", record.getOrderNumber());
+//            upSellMap.put("service", upSell.getService());
+//            upSellMap.put("partner", upSell.getPartner());
+//            upSellMap.put("technology", upSell.getTechnology());
+//            upSellMap.put("projectedValue", upSell.getProjectedValue());
+//            upSellMap.put("cm", upSell.getCm());
+//            return upSellMap;
+//        }).collect(Collectors.toList());
+//        response.put("upSellDetails", upSellDetails);
+//
+//        return response;
+//    }
+//}
+//
+//
+////    @Column(name = "sales_region")
+////        public List<String, Object>> getRecordsByType(String salesRegion){ //type, String value) {
+////            List<AssignmentRecord> records = (List<AssignmentRecord>) assignmentRepository.findBySalesRegion(salesRegion);
+////            if (records.isEmpty()) {
+////                throw new RuntimeException("No records found for " +salesRegion); //type + ": " + value);
+////            }
+////
+////            List<Map<String, Object>> result = new ArrayList<>();
+////
+////            for (AssignmentRecord record : records) {
+////                Map<String, Object> response = new HashMap<>();
+////                response.put("orderNumber", record.getOrderNumber());
+////                response.put("salesRegion", record.getSalesRegion());
+////                response.put("productID", record.getProductID());
+////                response.put("partner", record.getPartner());
+////                response.put("margin", record.getMargin());
+////                response.put("projectValue", record.getProjectValue());
+////                response.put("salesOrgID", record.getSalesOrgID());
+////                response.put("salesSubRegion", record.getSalesSubRegion());
+////                response.put("salesState", record.getSalesState());
+////                response.put("salesUnit", record.getSalesUnit());
+////                response.put("BLOrgID", record.getBLOrgID());
+////                response.put("BLRegion", record.getBLRegion());
+////                response.put("BLSubRegion", record.getBLSubRegion());
+////                response.put("BLDomain", record.getBLDomain());
+////                response.put("BLComp", record.getBLComp());
+////                response.put("BLUnit", record.getBLUnit());
+////                response.put("acctID", record.getAcctID());
+////                response.put("acctCategory", record.getAcctCategory());
+////                response.put("accountName", record.getAccountName());
+////                response.put("sector", record.getSector());
+////                response.put("industry", record.getIndustry());
+////                response.put("closureDate", record.getClosureDate());
+////                response.put("closureStage", record.getClosureStage());
+////                response.put("startDate", record.getStartDate());
+////                response.put("endDate", record.getEndDate());
+////                response.put("serviceLine", record.getServiceLine());
+////                response.put("service", record.getService());
+////                response.put("techID", record.getTechID());
+////                response.put("technology", record.getTechnology());
+////                response.put("serviceMode", record.getServiceMode());
+////                response.put("orderType", record.getOrderType());
+////                response.put("serviceType", record.getServiceType());
+////                response.put("engagementType", record.getEngagementType());
+////                response.put("CM", record.getCM());
+////
+////                // Fetch CrossSell data
+////                List<Map<String, String>> crossSellDetails = crossCellRepository.findBySalesRegion(record.getOrderNumber())
+////                        .stream()
+////                        .map(crossSell -> {
+////                            Map<String, String> crossSellMap = new HashMap<>();
+////                           // crossSellMap.put("orderNumber", crossSell.getOrderNumber());
+////                            crossSellMap.put("service", crossSell.getService());
+////                            crossSellMap.put("technology", crossSell.getTechnology());
+////                            crossSellMap.put("partner", crossSell.getPartner());
+////                            crossSellMap.put("ProjectedValue", crossSell.getProjectedValue());
+////                            crossSellMap.put("Cm", crossSell.getCm());
+////                            return crossSellMap;
+////                        }).collect(Collectors.toList());
+////
+////                response.put("crossSellDetails", crossSellDetails);
+////
+////                // Fetch UpSell data
+////                List<Map<String, String>> upSellDetails = upCellRepository.findBySalesRegion(record.getOrderNumber())
+////                        .stream()
+////                        .map(upSell -> {
+////                            Map<String, String> upSellMap = new HashMap<>();
+////                           // upSellMap.put("orderNumber", upSell.getOrderNumber());
+////                            upSellMap.put("service", upSell.getService());
+////                            upSellMap.put("technology", upSell.getTechnology());
+////                            upSellMap.put("partner", upSell.getPartner());
+////                            upSellMap.put("ProjectedValue",upSell.getProjectedValue());
+////                            upSellMap.put("Cm", upSell.getCm());
+////                            return upSellMap;
+////                        }).collect(Collectors.toList());
+////
+////                response.put("upSellDetails", upSellDetails);
+////
+////                result.add(response);
+////            }
+////
+////            return result;
+////        }
+////    }
+//
+//
+//
+//
+//
+//
+//
 
 
 

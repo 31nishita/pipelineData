@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +63,21 @@ public class TestController {
         Map<String, Object> response = assignmentService.getFilteredRecordByOrderNumber(orderNumber);
         return ResponseEntity.ok(response);
     }
+
+
+@GetMapping("/getRecordsBySalesRegion")
+public ResponseEntity<List<Map<String, Object>>> getRecordsBySalesRegion(@RequestParam String salesRegion) {
+    List<Map<String, Object>> response = assignmentService.getRecordsBySalesRegion(salesRegion);
+    return ResponseEntity.ok(response);
 }
+    @GetMapping("/getRecordsBySalesRegionWithOrderNumber")
+    public ResponseEntity<List<String>> getOrderNumberBySalesRegion(@RequestParam String salesRegion) {
+        List<String> orderNumbers = assignmentService.getOrderNumbersBySalesRegion(salesRegion);
+        return ResponseEntity.ok(orderNumbers);
+    }
+}
+
+
 
 
 

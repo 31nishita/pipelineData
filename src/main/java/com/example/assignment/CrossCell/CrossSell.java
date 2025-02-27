@@ -28,8 +28,8 @@ public class CrossSell{
 //    private AssignmentRecord assignmentRecord;
 
     private String service;
-    private String technology;
     private String partner;
+    private String technology;
     private String projectedValue;
     private String cm;
 
@@ -37,6 +37,7 @@ public class CrossSell{
 
     @ManyToOne
     @JoinColumn(name = "record", nullable = false)
+
     @JsonBackReference
     private AssignmentRecord assignmentRecord;
 
